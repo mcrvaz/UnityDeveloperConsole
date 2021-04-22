@@ -30,7 +30,5 @@ namespace UnityDevConsole.Views
         public InputField BodyText => bodyText;
         public InputField InputField => inputField;
         public HintUIView HintUI => hintUI;
-
-        public class Factory : PlaceholderFactory<ConsoleUIView, IConsoleSettings> { }
     }
 }

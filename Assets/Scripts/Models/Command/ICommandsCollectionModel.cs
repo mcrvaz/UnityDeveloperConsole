@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Zenject;
 
 namespace UnityDevConsole.Models.Command
 {
-    public interface ICommandsCollectionModel
+    public interface ICommandsCollectionModel : IInitializable
     {
         IReadOnlyDictionary<string, ICommandModel> Commands { get; }
-
-        void Initialize ();
 
         bool RegisterRuntimeCommand (
             string commandName,

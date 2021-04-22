@@ -1,19 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
-using UnityDevConsole.Controllers.Console;
+﻿using UnityDevConsole.Controllers.Console;
 using UnityDevConsole.Controllers.Hint;
 using UnityDevConsole.Controllers.Input;
 using UnityDevConsole.Models.Command;
 using UnityDevConsole.Models.Console;
-using Zenject;
 
-public class DeveloperConsole : IInitializable
+public class DeveloperConsole
 {
-    readonly IConsoleModel model;
-    readonly ICommandsCollectionModel commandsCollectionModel;
-    readonly IConsoleInputDetectorModel inputDetectorModel;
-    readonly ConsoleUIController consoleUIController;
-    readonly ConsoleHintUIController consoleHintUIController;
+    public IConsoleModel Console { get; }
+    public ICommandsCollectionModel CommandsCollectionModel { get; }
+    public IConsoleInputDetectorModel InputDetectorModel { get; }
+    public ConsoleUIController ConsoleUIController { get; }
+    public ConsoleHintUIController ConsoleHintUIController { get; }
 
     public DeveloperConsole (
         IConsoleModel model,
@@ -23,20 +20,14 @@ public class DeveloperConsole : IInitializable
         ConsoleHintUIController consoleHintUIController
     )
     {
-        this.model = model;
-        this.commandsCollectionModel = commandsCollectionModel;
-        this.inputDetectorModel = inputDetectorModel;
-        this.consoleUIController = consoleUIController;
-        this.consoleHintUIController = consoleHintUIController;
+        Console = model;
+        CommandsCollectionModel = commandsCollectionModel;
+        InputDetectorModel = inputDetectorModel;
+        ConsoleUIController = consoleUIController;
+        ConsoleHintUIController = consoleHintUIController;
     }
 
-    [Inject]
-    public void Initialize ()
-    {
-        Task.Run(commandsCollectionModel.Initialize);
-    }
-
-    public void Clear () => model?.ClearOutput();
+    public void Clear () => Console?.ClearOutput();
 
     public void RegisterRuntimeCommand (
         string commandName,
@@ -46,14 +37,14 @@ public class DeveloperConsole : IInitializable
         bool hidden
     )
     {
-        model.RegisterRuntimeCommand(commandName, methodName, context, developerOnly, hidden);
+        Console.RegisterRuntimeCommand(commandName, methodName, context, developerOnly, hidden);
     }
 
     public void UnregisterRuntimeCommand (string commandName)
-        => model.UnregisterRuntimeCommand(commandName);
+        => Console.UnregisterRuntimeCommand(commandName);
 
     public object ExecuteCommand (string commandName, string[] args)
-        => model.ExecuteCommand(commandName, args);
+        => Console.ExecuteCommand(commandName, args);
 
-    public void Log (object message) => model.Log(message);
+    public void Log (object message) => Console.Log(message);
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityDevConsole.Settings;
 using UnityEngine;
+using Zenject;
 
 namespace UnityDevConsole.Models.Command
 {
@@ -26,18 +28,22 @@ namespace UnityDevConsole.Models.Command
             this.commandFactory = commandFactory;
         }
 
+        [Inject]
         public void Initialize ()
         {
             try
             {
-                IReadOnlyDictionary<string, ICommandModel> commands = commandFactory
-                    .CreateFromAssemblies(settings.Assemblies);
-
-                lock (_lock)
+                Task.Run(() =>
                 {
-                    foreach (KeyValuePair<string, ICommandModel> command in commands)
-                        registeredCommands.Add(command.Key, command.Value);
-                }
+                    IReadOnlyDictionary<string, ICommandModel> commands = commandFactory
+                        .CreateFromAssemblies(settings.Assemblies);
+
+                    lock (_lock)
+                    {
+                        foreach (KeyValuePair<string, ICommandModel> command in commands)
+                            registeredCommands.Add(command.Key, command.Value);
+                    }
+                });
             }
             catch (Exception ex)
             {
