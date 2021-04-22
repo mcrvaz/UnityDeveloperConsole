@@ -1,63 +1,44 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using UnityDevConsole.Controllers.Console;
-using UnityDevConsole.Controllers.Hint.Factory;
+using UnityDevConsole.Controllers.Hint;
 using UnityDevConsole.Controllers.Input;
 using UnityDevConsole.Models.Command;
 using UnityDevConsole.Models.Console;
-using UnityDevConsole.Models.Console.Hint;
-using UnityDevConsole.Settings;
-using UnityDevConsole.Views;
-using UnityEngine;
+using Zenject;
 
-public static class DeveloperConsole
+public class DeveloperConsole : IInitializable
 {
-    static IConsoleModel model;
+    readonly IConsoleModel model;
+    readonly ICommandsCollectionModel commandsCollectionModel;
+    readonly IConsoleInputDetectorModel inputDetectorModel;
+    readonly ConsoleUIController consoleUIController;
+    readonly ConsoleHintUIController consoleHintUIController;
 
-    [RuntimeInitializeOnLoadMethod]
-    static void AutoInitialize ()
+    public DeveloperConsole (
+        IConsoleModel model,
+        ICommandsCollectionModel commandsCollectionModel,
+        IConsoleInputDetectorModel inputDetectorModel,
+        ConsoleUIController consoleUIController,
+        ConsoleHintUIController consoleHintUIController
+    )
     {
-        if (ConsoleSettings.Instance.AutoInitialize)
-            Initialize();
+        this.model = model;
+        this.commandsCollectionModel = commandsCollectionModel;
+        this.inputDetectorModel = inputDetectorModel;
+        this.consoleUIController = consoleUIController;
+        this.consoleHintUIController = consoleHintUIController;
     }
 
-    public static void Initialize ()
+    [Inject]
+    public void Initialize ()
     {
-        if (model != null)
-            return;
-
-        IConsoleSettings settings = ConsoleSettings.Instance;
-        IConsoleInputHistoryModel historyModel = ConsoleInputHistoryModelFactory.Create(settings);
-        ICommandsCollectionModel commandsCollection = CommandsCollectionFactory.Create(settings);
-        model = ConsoleModelFactory.Create(historyModel, commandsCollection);
-
-        IConsoleHintModel hintModel = ConsoleHintModelFactory.Create(
-            historyModel,
-            commandsCollection,
-            settings
-        );
-
-        ConsoleUIView view = ConsoleUIViewFactory.Create(settings);
-        IConsoleInputDetectorModel inputDetector = ConsoleInputDetectorModelFactory.Create(
-            view,
-            model,
-            settings
-        );
-
-        ConsoleUIControllerFactory.Create(model, view, inputDetector, hintModel);
-        ConsoleHintUIControllerFactory.Create(
-            hintModel,
-            view.HintUI,
-            view,
-            inputDetector,
-            settings
-        );
-        Task.Run(commandsCollection.Initialize);
-        inputDetector.Initialize();
+        Task.Run(commandsCollectionModel.Initialize);
     }
 
-    public static void Clear () => model?.ClearOutput();
+    public void Clear () => model?.ClearOutput();
 
-    public static void RegisterRuntimeCommand (
+    public void RegisterRuntimeCommand (
         string commandName,
         string methodName,
         object context,
@@ -68,11 +49,11 @@ public static class DeveloperConsole
         model.RegisterRuntimeCommand(commandName, methodName, context, developerOnly, hidden);
     }
 
-    public static void UnregisterRuntimeCommand (string commandName)
+    public void UnregisterRuntimeCommand (string commandName)
         => model.UnregisterRuntimeCommand(commandName);
 
-    public static object ExecuteCommand (string commandName, string[] args)
+    public object ExecuteCommand (string commandName, string[] args)
         => model.ExecuteCommand(commandName, args);
 
-    public static void Log (object message) => model.Log(message);
+    public void Log (object message) => model.Log(message);
 }

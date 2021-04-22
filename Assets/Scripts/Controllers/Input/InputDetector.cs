@@ -3,6 +3,7 @@ using System.Collections;
 using UnityDevConsole.Models.Console;
 using UnityDevConsole.Settings;
 using UnityEngine;
+using Zenject;
 
 namespace UnityDevConsole.Controllers.Input
 {
@@ -36,6 +37,7 @@ namespace UnityDevConsole.Controllers.Input
             this.settings = settings;
         }
 
+        [Inject]
         public void Initialize ()
         {
             listenRoutine = runner.StartCoroutine(ListenToInput());

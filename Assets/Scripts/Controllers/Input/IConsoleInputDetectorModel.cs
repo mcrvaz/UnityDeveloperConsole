@@ -1,16 +1,14 @@
 using System;
-using UnityDevConsole.Models.Console;
+using Zenject;
 
 namespace UnityDevConsole.Controllers.Input
 {
-    public interface IConsoleInputDetectorModel : IDisposable
+    public interface IConsoleInputDetectorModel : IInitializable, IDisposable
     {
         event Action OnToggleVisibility;
         event Action OnSubmit;
         event Action OnMoveUp;
         event Action OnMoveDown;
         event Action OnEscape;
-
-        void Initialize ();
     }
 }

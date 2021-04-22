@@ -1,6 +1,8 @@
-﻿using UnityDevConsole.Views.Hint;
+﻿using UnityDevConsole.Settings;
+using UnityDevConsole.Views.Hint;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace UnityDevConsole.Views
 {
@@ -28,5 +30,7 @@ namespace UnityDevConsole.Views
         public InputField BodyText => bodyText;
         public InputField InputField => inputField;
         public HintUIView HintUI => hintUI;
+
+        public class Factory : PlaceholderFactory<ConsoleUIView, IConsoleSettings> { }
     }
 }
